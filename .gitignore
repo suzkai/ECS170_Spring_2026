@@ -4,3 +4,4 @@ misc.xml
 *.png
 /.idea/
 /data/
+__pycache__/
