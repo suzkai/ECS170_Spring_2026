@@ -28,7 +28,7 @@ print(f'Train: {len(train_data)}, Test: {len(test_data)}')
 method_obj = Method_RNN()
 
 # HYPERPARAMETERS
-method_obj.max_vocab_size = 20_000
+method_obj.max_vocab_size = 20000
 method_obj.max_seq_len = 200
 method_obj.embed_dim = 128
 method_obj.hidden_dim = 256
