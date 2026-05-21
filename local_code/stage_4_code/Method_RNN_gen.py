@@ -90,7 +90,11 @@ class Method_RNN_Generation:
         if len(context) < self.seq_len:
             context = [pad_idx] * (self.seq_len - len(context)) + context
 
-        generated = list(seed_words)
+        generated = []
+        for w in seed_words:
+            known = w in self.word2idx
+            generated.append(w if known else f'[{w}?]') # marks unknown words by wrapping in brackets
+            
         hidden = None
 
         with torch.no_grad():
@@ -107,7 +111,43 @@ class Method_RNN_Generation:
                 if choice == eos_idx:
                     break
 
-                generated.append(self.idx2word.get(choice, '<UNK>'))
+                if choice == unk_idx:
+                    # if UNK sampled, look in training data
+                    current_phrase = ' '.join(generated).lower()
+                    continuation = None
+                    for text in self.data:
+                        text_lower = text.lower()
+                        idx = text_lower.find(current_phrase)
+                        if idx != -1: # if found, get rest of phrase
+                            rest = text_lower[idx + len(current_phrase):].strip()
+                            rest_words = clean_text_gen(rest)
+                            # filter out UNK words not in vocab
+                            special_tokens = {'<UNK>', '<PAD>', '<EOS>'}
+                            filtered = []
+                            for w in rest_words: # filter out words not in vocab or special tokens
+                                in_vocab = w in self.word2idx
+                                special = w in special_tokens
+                                if in_vocab and not special:
+                                    filtered.append(w)
+                            if rest_words:
+                                continuation = rest_words
+                                break
+
+                    if continuation:
+                        generated.extend(continuation)
+                        break
+
+                    # no training match — resample excluding <UNK> and <PAD>
+                    last_logits[unk_idx] = -float('inf')
+                    last_logits[pad_idx] = -float('inf')
+                    top_vals, top_idx = torch.topk(last_logits, self.top_k)
+                    probs = torch.softmax(top_vals, dim=0).cpu().numpy()
+                    choice = np.random.choice(top_idx.cpu().numpy(), p=probs)
+
+                    if choice == eos_idx:
+                        break
+
+                generated.append(self.idx2word[choice])
                 context = context[1:] + [choice]
 
         return ' '.join(generated)
