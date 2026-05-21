@@ -1,0 +1,4 @@
+Generated: what kind of car did the german cowboy purchase? audi tips hat Seed words: ['what']
+Generated: what did the mailman say when his mail truck caught fire? that he needed to address the situation Seed words: ['what', 'did']
+Generated: what did the fish say when it ran into the wall? dam Seed words: ['what', 'did', 'the']
+Generated: what did the chicken cross the playground? to get to the other slide Seed words: ['what', 'did', 'the', 'chicken']

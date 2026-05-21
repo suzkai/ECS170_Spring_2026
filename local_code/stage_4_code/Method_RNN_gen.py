@@ -57,8 +57,8 @@ class RNNLanguageModel(nn.Module):
 
 
 class Method_RNN_Generation:
-    dataset_name = 'Joke Generation (Baseline)'
-    save_curve_path = os.path.join(os.path.dirname(__file__), '..', '..', 'result', 'stage_4_result', 'RNN_generation_baseline_loss.png')
+    dataset_name = 'Joke Generation'
+    save_curve_path = 'result/stage_4_result/generation_curve.png'
 
     def __init__(self):
         self.word2idx = None
@@ -111,6 +111,21 @@ class Method_RNN_Generation:
                 context = context[1:] + [choice]
 
         return ' '.join(generated)
+
+    def _plot_curve(self, loss, seed_words):
+        nsw = len(seed_words)
+        dir_path = self.save_curve_path.replace('generation_curve.png', '')
+        base = f'{dir_path}{nsw}_generation_curve'
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.plot(range(1, len(loss) + 1), loss)
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Loss')
+        ax.set_title('Training Loss - ' + self.dataset_name)
+        ax.grid(True)
+        fig.tight_layout()
+        loss_path = base + '_loss.png'
+        fig.savefig(loss_path)
+        plt.close(fig)
 
     def run(self):
         print('starting training on', self.dataset_name)
@@ -170,21 +185,10 @@ class Method_RNN_Generation:
             if epoch % 10 == 0 or epoch == 1:
                 print(f'Epoch {epoch}/{self.num_epochs} - loss: {epoch_loss}')
 
-        # plot loss curve
-        plt.figure()
-        plt.plot(range(1, len(losses) + 1), losses)
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
-        plt.title('Training Loss - ' + self.dataset_name)
-        plt.grid(True)
-        plt.savefig(self.save_curve_path)
-        print('saved loss curve to', self.save_curve_path)
-        plt.close()
-
         # generate from seed words
-        print('\nSeed words:', self.seed_words)
         generated = self._generate(model, self.seed_words, device)
         print('Generated text:', generated)
+        print('\nSeed words:', self.seed_words)
 
         # compare with training data
         print('\nTraining samples containing seed phrase:')
@@ -197,9 +201,7 @@ class Method_RNN_Generation:
             for i in matches:
                 print('-', i)
         else:
-            print('no exact matches, showing random samples:')
-            for t in random.sample(texts, min(5, len(texts))):
-                print(' -', t)
+            print('no matches')
 
         # "Perplexity, a measure of the uncertainty or unpredictability of a language model,
         # plays a crucial role in the performance and evaluation of RNNs,
@@ -210,6 +212,12 @@ class Method_RNN_Generation:
         correctness = np.exp(losses[-1])
         print(f'\nCorrectness: {correctness}')
         print('Final training loss:', round(losses[-1], 4))
+
+        txt_path = getattr(self, 'jokes_file', 'result/stage_4_result/generated_jokes.txt')
+        with open(txt_path, 'a', encoding='utf-8') as f:
+            f.write(f'Generated: {generated} Seed words: {self.seed_words}\n')
+
+        self._plot_curve(losses, self.seed_words)
 
         return {
             'generated_text': generated,

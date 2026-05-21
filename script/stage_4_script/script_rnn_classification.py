@@ -49,7 +49,6 @@ method_obj.hidden_dim = 256
 method_obj.num_layers = 2
 method_obj.dropout = 0.5
 method_obj.rnn_type = 'lstm'
-method_obj.bidirectional = True
 method_obj.num_classes = 2
 method_obj.batch_size = 64
 method_obj.num_epochs = 20
