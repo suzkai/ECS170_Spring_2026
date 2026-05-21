@@ -32,3 +32,37 @@ Classification Report:
 weighted avg       0.87      0.87      0.87     25000
 
 
+RNN 50 epochs:
+Accuracy: 0.63756
+Precision: 0.661047110611595
+Recall: 0.56464
+F1 Score: 0.6090520774906157
+
+Classification Report:
+              precision    recall  f1-score   support
+
+    negative       0.62      0.71      0.66     12500
+    positive       0.66      0.56      0.61     12500
+
+    accuracy                           0.64     25000
+   macro avg       0.64      0.64      0.64     25000
+weighted avg       0.64      0.64      0.64     25000
+
+
+RNN1 50 epochs:
+Accuracy: 0.81756
+Precision: 0.8214951000242974
+Recall: 0.81144
+F1 Score: 0.8164365919426892
+
+Classification Report:
+              precision    recall  f1-score   support
+
+    negative       0.81      0.82      0.82     12500
+    positive       0.82      0.81      0.82     12500
+
+    accuracy                           0.82     25000
+   macro avg       0.82      0.82      0.82     25000
+weighted avg       0.82      0.82      0.82     25000
+
+
