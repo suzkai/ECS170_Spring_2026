@@ -41,7 +41,7 @@ method_obj.dropout = 0.3
 method_obj.batch_size = 128
 method_obj.num_epochs = 100
 method_obj.lr = 1e-3
-method_obj.seed_words = ['what', 'did', 'the']
+method_obj.seed_words = ['chud', 'boba', 'feng']
 # method_obj.seed_words = ['what', 'did']
 # method_obj.seed_words = ['what']
 # method_obj.seed_words = ['what', 'did', 'the', 'fish']
@@ -64,7 +64,7 @@ all_seed_words = [
     ['what'],
     ['what', 'did'],
     ['what', 'did', 'the'],
-    ['what', 'did', 'the', 'chicken'],
+    ['what', 'did', 'the', 'dog'],
 ]
 
 def run_all():
@@ -74,7 +74,7 @@ def run_all():
         method_obj.run()
 
 # individual run
-# method_obj.run()
+method_obj.run()
 
 # run all seed words
-run_all()
+# run_all()
