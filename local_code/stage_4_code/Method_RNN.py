@@ -60,7 +60,7 @@ def encode_data(all_tokens, vocab, max_len):
         result[i, :len(ids)] = ids
     return result
 
-
+# RNN: single layer Tanh
 class RNN(nn.Module):
     def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes):
         super().__init__()
@@ -92,39 +92,133 @@ class RNN(nn.Module):
             output = self(x)
         return output.argmax(dim=1).cpu().numpy()
 
+# RNN1: LSTM only
+# Note* LSTM replaces relu with its own gating, so no activation
+class RNN1(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, num_classes)
+
+    def forward(self, x):
+        out, _ = self.lstm(self.embedding(x))
+        return self.fc(out[:, -1, :])
+
+    def step(self, x, y, optimizer, criterion):
+        optimizer.zero_grad()
+        loss = criterion(self(x), y)
+        loss.backward()
+        nn.utils.clip_grad_norm_(self.parameters(), max_norm=5.0)
+        optimizer.step()
+        with torch.no_grad():
+            preds = self(x).argmax(dim=1)
+        return loss.item(), preds.cpu().numpy()
+
+    def predict(self, x):
+        with torch.no_grad():
+            return self(x).argmax(dim=1).cpu().numpy()
+
+
+# RNN2: LSTM, multilayer
+# Multilayer set to 2 but can be changed for extra testing
+class RNN2(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes, num_layers=2): # Change Number of layers here
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, num_layers=num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, num_classes)
+
+    def forward(self, x):
+        out, _ = self.lstm(self.embedding(x))
+        return self.fc(out[:, -1, :])
+
+    def step(self, x, y, optimizer, criterion):
+        optimizer.zero_grad()
+        loss = criterion(self(x), y)
+        loss.backward()
+        nn.utils.clip_grad_norm_(self.parameters(), max_norm=5.0)
+        optimizer.step()
+        with torch.no_grad():
+            preds = self(x).argmax(dim=1)
+        return loss.item(), preds.cpu().numpy()
+
+    def predict(self, x):
+        with torch.no_grad():
+            return self(x).argmax(dim=1).cpu().numpy()
+
+
+# RNN3: LSTM, multilayer, dropout
+class RNN3(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes, num_layers=2, dropout=0.3):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.dropout = nn.Dropout(dropout)
+        self.lstm = nn.LSTM(
+            embed_dim, hidden_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            dropout=dropout if num_layers > 1 else 0.0,
+        )
+        self.fc = nn.Linear(hidden_dim, num_classes)
+
+    def forward(self, x):
+        out, _ = self.lstm(self.dropout(self.embedding(x)))
+        return self.fc(self.dropout(out[:, -1, :]))
+
+    def step(self, x, y, optimizer, criterion):
+        optimizer.zero_grad()
+        loss = criterion(self(x), y)
+        loss.backward()
+        nn.utils.clip_grad_norm_(self.parameters(), max_norm=5.0)
+        optimizer.step()
+        with torch.no_grad():
+            preds = self(x).argmax(dim=1)
+        return loss.item(), preds.cpu().numpy()
+
+    def predict(self, x):
+        with torch.no_grad():
+            return self(x).argmax(dim=1).cpu().numpy()
 
 class Method_RNN:
     dataset_name = 'IMDB Sentiment'
-    save_curve_path = os.path.join(os.path.dirname(__file__), '..', '..', 'result', 'stage_4_result', 'RNN_classification_curves.png')
+    save_curve_path = 'result/stage_4_result/classification_curve.png'
 
     def __init__(self):
         self.data = None
+        self.model_class = RNN
 
-    def _plot_curves(self, history):
+    def _plot_curves(self, history, model_name):
         epochs = range(1, len(history['train_loss']) + 1)
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-        fig.suptitle('RNN Learning Curves - ' + self.dataset_name)
+        dir_path = self.save_curve_path.replace('classification_curve.png', '')
+        base = f'{dir_path}{model_name}_classification_curve'
 
+        fig1, ax1 = plt.subplots(figsize=(6, 4))
         ax1.plot(epochs, history['train_loss'], label='Train Loss')
         ax1.plot(epochs, history['test_loss'], label='Test Loss')
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel('Loss')
-        ax1.set_title('Loss')
+        ax1.set_title('Loss - ' + self.dataset_name)
         ax1.legend()
         ax1.grid(True)
+        fig1.tight_layout()
+        loss_path = base + '_loss.png'
+        fig1.savefig(loss_path)
+        plt.close(fig1)
 
+        fig2, ax2 = plt.subplots(figsize=(6, 4))
         ax2.plot(epochs, history['train_acc'], label='Train Accuracy')
         ax2.plot(epochs, history['test_acc'], label='Test Accuracy')
         ax2.set_xlabel('Epoch')
         ax2.set_ylabel('Accuracy')
-        ax2.set_title('Accuracy')
+        ax2.set_title('Accuracy - ' + self.dataset_name)
+        ax2.set_ylim(0, 1)
         ax2.legend()
         ax2.grid(True)
-
-        plt.tight_layout()
-        plt.savefig(self.save_curve_path)
-        print('saved learning curve to', self.save_curve_path)
-        plt.close()
+        fig2.tight_layout()
+        acc_path = base + '_acc.png'
+        fig2.savefig(acc_path)
+        plt.close(fig2)
 
     def run(self):
         train_pairs = self.data['train']
@@ -155,7 +249,11 @@ class Method_RNN:
         print('device:', device)
 
         # create model, optimizer, loss
-        model = RNN(len(vocab), self.embed_dim, self.hidden_dim, self.num_classes).to(device)
+        
+        model = self.model_class(len(vocab), self.embed_dim, self.hidden_dim, self.num_classes,
+                                 **({} if self.model_class in (RNN, RNN1) else
+                                    {'num_layers': self.num_layers} if self.model_class == RNN2 else
+                                    {'num_layers': self.num_layers, 'dropout': self.dropout})).to(device)
         optimizer = optim.Adam(model.parameters(), lr=self.lr)
         criterion = nn.CrossEntropyLoss()
 
@@ -221,6 +319,16 @@ class Method_RNN:
         print('\nClassification Report:')
         print(classification_report(true_list, final_preds, target_names=['negative', 'positive'], zero_division=0))
 
-        self._plot_curves(history)
+        result_path = 'result/stage_4_result/Results.txt'
+        with open(result_path, 'a', encoding='utf-8') as f:
+            f.write(f'{self.model_class.__name__} {self.num_epochs} epochs:\n')
+            f.write(f'Accuracy: {accuracy_score(true_list, final_preds)}\n')
+            f.write(f'Precision: {precision_score(true_list, final_preds, average="binary", zero_division=0)}\n')
+            f.write(f'Recall: {recall_score(true_list, final_preds, average="binary", zero_division=0)}\n')
+            f.write(f'F1 Score: {f1_score(true_list, final_preds, average="binary", zero_division=0)}\n')
+            f.write('\nClassification Report:\n')
+            f.write(classification_report(true_list, final_preds, target_names=['negative', 'positive'], zero_division=0) + '\n\n')
+
+        self._plot_curves(history, type(model).__name__)
 
         return {'pred_y': final_preds, 'true_y': true_list, 'final_acc': accuracy_score(true_list, final_preds), 'history': history}
