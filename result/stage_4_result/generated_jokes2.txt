@@ -1,0 +1,4 @@
+Generated: what do you call a car that eats other cars? a carnivore. Seed words: ['what']
+Generated: what did the owner of a brownie factory say when his factory caught fire? i'm getting the fudge outta here! Seed words: ['what', 'did']
+Generated: what did the 0 say to the 8? nice belt. Seed words: ['what', 'did', 'the']
+Generated: what did the dog say to the turkey who couldn't cut around good at so my cat curiosity . he told me 10 jokes to make me feel better. Seed words: ['what', 'did', 'the', 'dog']

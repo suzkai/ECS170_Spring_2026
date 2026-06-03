@@ -1,0 +1,4 @@
+Generated: what is the difference between a siberian husky and an alaskan husky? about 1500 miles. Seed words: ['what']
+Generated: what did the host serve his guests for the simpsons marathon night? disco stew! Seed words: ['what', 'did']
+Generated: what did the german air force eat for breakfast during ww2? luftwaffles Seed words: ['what', 'did', 'the']
+Generated: what did the fart call the hard on my house. Seed words: ['what', 'did', 'the', 'fart']
