@@ -1,0 +1,20 @@
+GCN Node Classification - cora
+Accuracy: 0.83
+Precision: 0.8122622394143638
+Recall: 0.8377213818507334
+F1 Score: 0.8197522156200009
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.84      0.74      0.79       112
+           1       0.65      0.95      0.77        56
+           2       0.79      0.92      0.85        95
+           3       0.73      0.70      0.71       139
+           4       0.93      0.91      0.92       125
+           5       0.87      0.86      0.86       323
+           6       0.88      0.79      0.83       150
+
+    accuracy                           0.83      1000
+   macro avg       0.81      0.84      0.82      1000
+weighted avg       0.84      0.83      0.83      1000
