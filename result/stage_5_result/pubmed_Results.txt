@@ -1,0 +1,16 @@
+GCN Node Classification - pubmed
+Accuracy: 0.79
+Precision: 0.7788351712082545
+Recall: 0.8034973516752307
+F1 Score: 0.7872719083124015
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.79      0.82      0.80       383
+           1       0.70      0.86      0.77       188
+           2       0.84      0.73      0.79       429
+
+    accuracy                           0.79      1000
+   macro avg       0.78      0.80      0.79      1000
+weighted avg       0.80      0.79      0.79      1000

@@ -2,6 +2,8 @@
 # ADDED 3-layer GCN with residual, batch norm, early stopping, 
 #       LR scheduler, hyperparameters for each dataset
 #############################################################
+
+# based off Kipf & Welling 2017, Citeseer/Pubmed based off Geom-GCN 2020.
 from local_code.base_class.method import method
 
 import torch
