@@ -3,7 +3,7 @@
 #       LR scheduler, hyperparameters for each dataset
 #############################################################
 
-# based off Kipf & Welling 2017, Citeseer/Pubmed based off Geom-GCN 2020.
+# Cora based off Kipf & Welling 2017, Citeseer/Pubmed based off Geom-GCN 2020.
 from local_code.base_class.method import method
 
 import torch
@@ -216,10 +216,10 @@ class Method_GCN_Improved(method):
         with open(result_path, 'w', encoding='utf-8') as f:
             f.write(f'GCN Improved Node Classification - {self.dataset_name}\n')
             f.write(f'Best epoch: {best_epoch}\n')
-            f.write(f'Accuracy:  {accuracy_score(true_labels, test_preds)}\n')
+            f.write(f'Accuracy: {accuracy_score(true_labels, test_preds)}\n')
             f.write(f'Precision: {precision_score(true_labels, test_preds, average="macro", zero_division=0)}\n')
-            f.write(f'Recall:    {recall_score(true_labels, test_preds, average="macro", zero_division=0)}\n')
-            f.write(f'F1 Score:  {f1_score(true_labels, test_preds, average="macro", zero_division=0)}\n\n')
+            f.write(f'Recall: {recall_score(true_labels, test_preds, average="macro", zero_division=0)}\n')
+            f.write(f'F1 Score: {f1_score(true_labels, test_preds, average="macro", zero_division=0)}\n\n')
             f.write('Classification Report:\n')
             f.write(classification_report(true_labels, test_preds, zero_division=0))
 
