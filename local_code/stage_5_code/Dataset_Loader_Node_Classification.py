@@ -5,7 +5,7 @@ Concrete IO class for a specific dataset
 # Copyright (c) 2017 Jiawei Zhang <jwzhanggy@gmail.com>
 # License: TBD
 
-from code.base_class.dataset import dataset
+from local_code.base_class.dataset import dataset
 import torch
 import numpy as np
 import scipy.sparse as sp
